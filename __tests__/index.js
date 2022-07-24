@@ -7,29 +7,30 @@ const rimraf = require('rimraf')
 const tempy = require('tempy')
 const installFrom = require('../src/install')
 const uninstallFrom = require('../src/uninstall')
+const findDepDir = require('../src/utils/findDepDir')
 
 function install(rootDir, dir) {
-  installFrom(path.join(rootDir, dir))
+  installFrom(findDepDir(path.join(rootDir, dir)))
 }
 
 function uninstall(rootDir, dir) {
-  uninstallFrom(path.join(rootDir, dir))
+  uninstallFrom(findDepDir(path.join(rootDir, dir)))
 }
 
 function mkdir(rootDir, dir) {
-  mkdirp.sync(path.join(rootDir, dir))
+  mkdirp.sync(findDepDir(path.join(rootDir, dir)))
 }
 
 function writeFile(dir, filePath, data) {
-  fs.writeFileSync(path.join(dir, filePath), data)
+  fs.writeFileSync(findDepDir(path.join(dir, filePath)), data)
 }
 
 function readFile(dir, filePath) {
-  return fs.readFileSync(path.join(dir, filePath), 'utf-8')
+  return fs.readFileSync(findDepDir(path.join(dir, filePath)), 'utf-8')
 }
 
 function exists(dir, filePath) {
-  return fs.existsSync(path.join(dir, filePath))
+  return fs.existsSync(findDepDir(path.join(dir, filePath)))
 }
 
 describe('yorkie', () => {
@@ -167,5 +168,24 @@ describe('yorkie', () => {
     const hook = readFile(dir, '.git/hooks/pre-commit')
     expect(hook).toMatch('yorkie')
     expect(hook).not.toMatch('./node_modules/pre-commit/hook')
+  })
+
+  it('should support installing from pnpm', () => {
+    mkdir(dir, '.git/hooks')
+    mkdir(dir, 'node_modules/.pnpm/registry.npmmirror.com+yorkie@2.0.0/node_modules/yorkie')
+    writeFile(dir, 'package.json', '{}')
+
+    install(dir, 'node_modules/.pnpm/registry.npmmirror.com+yorkie@2.0.0/node_modules/yorkie')
+    const hook = readFile(dir, '.git/hooks/pre-commit')
+
+    expect(hook).toMatch('#yorkie')
+    expect(hook).toMatch('cd "."')
+    expect(hook).toMatch('--no-verify')
+
+    const prepareCommitMsg = readFile(dir, '.git/hooks/prepare-commit-msg')
+    expect(prepareCommitMsg).toMatch('cannot be bypassed')
+
+    uninstall(dir, 'node_modules/.pnpm/registry.npmmirror.com+yorkie@2.0.0/node_modules/yorkie')
+    expect(exists(dir, '.git/hooks/pre-push')).toBeFalsy()
   })
 })

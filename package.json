@@ -1,6 +1,6 @@
 {
   "name": "yorkie",
-  "version": "2.0.0",
+  "version": "0.0.0",
   "description": "githooks management forked from husky",
   "engines": {
     "node": ">=4"

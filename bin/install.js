@@ -4,6 +4,7 @@
 const path = require('path')
 const isCI = require('is-ci')
 const installFrom = require('../src/install')
+const findDepDir = require('../src/utils/findDepDir')
 
 if (isCI && !process.env.HUSKY_IGNORE_CI && !process.env.YORKIE_IGNORE_CI) {
   console.log('CI detected, skipping Git hooks installation')
@@ -20,5 +21,5 @@ if (process.env.HUSKY_SKIP_INSTALL || process.env.YORKIE_SKIP_INSTALL) {
 
 console.log('setting up Git hooks')
 
-const depDir = path.join(__dirname, '..')
+const depDir = findDepDir(path.join(__dirname, '..'))
 installFrom(depDir)
