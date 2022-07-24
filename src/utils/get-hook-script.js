@@ -10,7 +10,7 @@ function platformSpecific() {
     // Add
     // Node standard installation path /c/Program Files/nodejs
     // for GUI apps
-    // https://github.com/typicode/yorkie/issues/49
+    // https://github.com/typicode/tailuo/issues/49
     return stripIndent(
       `
       # Node standard installation
@@ -18,7 +18,7 @@ function platformSpecific() {
     )
   } else {
     // Using normalize to support ' in path
-    // https://github.com/typicode/yorkie/issues/117
+    // https://github.com/typicode/tailuo/issues/117
     const home = normalize(process.env.HOME)
 
     return stripIndent(
@@ -50,7 +50,7 @@ module.exports = function getHookScript(hookName, relativePath, runnerPath) {
     stripIndent(
       `
       #!/bin/sh
-      #yorkie ${pkg.version}
+      #tailuo ${pkg.version}
 
       command_exists () {
         command -v "$1" >/dev/null 2>&1

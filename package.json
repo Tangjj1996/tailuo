@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/yyx990803/yorkie.git"
+    "url": "git://github.com/Tangjj1996/tailuo.git"
   },
   "keywords": [
     "git",
@@ -35,9 +35,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/yyx990803/yorkie/issues"
+    "url": "https://github.com/Tangjj1996/tailuo/issues"
   },
-  "homepage": "https://github.com/yyx990803/yorkie",
+  "homepage": "https://github.com/Tangjj1996/tailuo",
   "devDependencies": {
     "jest": "^20.0.4",
     "mkdirp": "^0.5.1",

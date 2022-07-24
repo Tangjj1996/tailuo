@@ -56,7 +56,7 @@ function createHook(depDir, projectDir, hooksDir, hookName, runnerPath) {
     return MIGRATE_PRE_COMMIT
   }
 
-  if (is.huskyOrYorkie(filename)) {
+  if (is.huskyOrTAILUO(filename)) {
     write(filename, hookScript)
     return UPDATE
   }
@@ -76,7 +76,7 @@ function installFrom(depDir) {
 
     const projectDir = findParent(depDir, 'package.json')
     const hooksDir = findHooksDir(projectDir)
-    const runnerPath = './node_modules/yorkie/src/runner.js'
+    const runnerPath = './node_modules/tailuo/src/runner.js'
 
     if (hooksDir) {
       hooks

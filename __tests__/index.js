@@ -33,70 +33,70 @@ function exists(dir, filePath) {
   return fs.existsSync(findDepDir(path.join(dir, filePath)))
 }
 
-describe('yorkie', () => {
+describe('tailuo', () => {
   let dir
   beforeEach(() => (dir = tempy.directory()))
   afterEach(() => rimraf.sync(dir))
 
   it('should support basic layout', () => {
     mkdir(dir, '.git/hooks')
-    mkdir(dir, 'node_modules/yorkie')
+    mkdir(dir, 'node_modules/tailuo')
     writeFile(dir, 'package.json', '{}')
 
-    install(dir, '/node_modules/yorkie')
+    install(dir, '/node_modules/tailuo')
     const hook = readFile(dir, '.git/hooks/pre-commit')
 
-    expect(hook).toMatch('#yorkie')
+    expect(hook).toMatch('#tailuo')
     expect(hook).toMatch('cd "."')
-    expect(hook).toMatch(`node "./node_modules/yorkie/src/runner.js" pre-commit`)
+    expect(hook).toMatch(`node "./node_modules/tailuo/src/runner.js" pre-commit`)
     expect(hook).toMatch('--no-verify')
 
     const prepareCommitMsg = readFile(dir, '.git/hooks/prepare-commit-msg')
     expect(prepareCommitMsg).toMatch('cannot be bypassed')
 
-    uninstall(dir, 'node_modules/yorkie')
+    uninstall(dir, 'node_modules/tailuo')
     expect(exists(dir, '.git/hooks/pre-push')).toBeFalsy()
   })
 
   it('should not install git hooks when installed in sub directory', () => {
     mkdir(dir, '.git/hooks')
-    mkdir(dir, 'A/B/node_modules/yorkie')
+    mkdir(dir, 'A/B/node_modules/tailuo')
     writeFile(dir, 'A/B/package.json', '{}')
 
-    install(dir, 'A/B/node_modules/yorkie')
+    install(dir, 'A/B/node_modules/tailuo')
     expect(exists(dir, '.git/hooks/pre-commit')).toBeFalsy()
   })
 
   it('should support git submodule', () => {
     mkdir(dir, '.git/modules/A/B')
-    mkdir(dir, 'A/B/node_modules/yorkie')
+    mkdir(dir, 'A/B/node_modules/tailuo')
     writeFile(dir, 'package.json', '{}')
     writeFile(dir, 'A/B/package.json', '{}')
     writeFile(dir, 'A/B/.git', 'git: ../../.git/modules/A/B')
 
-    install(dir, 'A/B/node_modules/yorkie')
+    install(dir, 'A/B/node_modules/tailuo')
     const hook = readFile(dir, '.git/modules/A/B/hooks/pre-commit')
 
     expect(hook).toMatch('cd "."')
 
-    uninstall(dir, 'A/B/node_modules/yorkie')
+    uninstall(dir, 'A/B/node_modules/tailuo')
     expect(exists(dir, '.git/hooks/pre-push')).toBeFalsy()
   })
 
   it('should not install git hooks in submodule sub directory', () => {
     mkdir(dir, '.git/modules/A/B')
-    mkdir(dir, 'A/B/C/node_modules/yorkie')
+    mkdir(dir, 'A/B/C/node_modules/tailuo')
     writeFile(dir, 'package.json', '{}')
     writeFile(dir, 'A/B/C/package.json', '{}')
     writeFile(dir, 'A/B/.git', 'git: ../../.git/modules/A/B')
 
-    install(dir, 'A/B/C/node_modules/yorkie')
+    install(dir, 'A/B/C/node_modules/tailuo')
     expect(exists(dir, '.git/modules/A/B/hooks/pre-commit')).toBeFalsy()
   })
 
   it('should support git worktrees', () => {
     mkdir(dir, '.git/worktrees/B')
-    mkdir(dir, 'A/B/node_modules/yorkie')
+    mkdir(dir, 'A/B/node_modules/tailuo')
     writeFile(dir, 'package.json', '{}')
     writeFile(dir, 'A/B/package.json', '{}')
 
@@ -104,88 +104,88 @@ describe('yorkie', () => {
     const absolutePath = path.join(dir, '.git/worktrees/B')
     writeFile(dir, 'A/B/.git', `git: ${absolutePath}`)
 
-    install(dir, 'A/B/node_modules/yorkie')
+    install(dir, 'A/B/node_modules/tailuo')
     const hook = readFile(dir, '.git/worktrees/B/hooks/pre-commit')
 
     expect(hook).toMatch('cd "."')
 
-    uninstall(dir, 'A/B/node_modules/yorkie')
+    uninstall(dir, 'A/B/node_modules/tailuo')
     expect(exists(dir, '.git/hooks/pre-commit')).toBeFalsy()
   })
 
   it('should not modify user hooks', () => {
     mkdir(dir, '.git/hooks')
-    mkdir(dir, 'node_modules/yorkie')
+    mkdir(dir, 'node_modules/tailuo')
     writeFile(dir, '.git/hooks/pre-push', 'foo')
 
     // Verify that it's not overwritten
-    install(dir, 'node_modules/yorkie')
+    install(dir, 'node_modules/tailuo')
     const hook = readFile(dir, '.git/hooks/pre-push')
     expect(hook).toBe('foo')
 
-    uninstall(dir, 'node_modules/yorkie')
+    uninstall(dir, 'node_modules/tailuo')
     expect(exists(dir, '.git/hooks/pre-push')).toBeTruthy()
   })
 
   it('should not install from /node_modules/A/node_modules', () => {
     mkdir(dir, '.git/hooks')
-    mkdir(dir, 'node_modules/A/node_modules/yorkie')
+    mkdir(dir, 'node_modules/A/node_modules/tailuo')
 
-    install(dir, 'node_modules/A/node_modules/yorkie')
+    install(dir, 'node_modules/A/node_modules/tailuo')
     expect(exists(dir, '.git/hooks/pre-push')).toBeFalsy()
   })
 
   it("should not crash if there's no .git directory", () => {
-    mkdir(dir, 'node_modules/yorkie')
+    mkdir(dir, 'node_modules/tailuo')
 
-    expect(() => install(dir, 'node_modules/yorkie')).not.toThrow()
-    expect(() => uninstall(dir, 'node_modules/yorkie')).not.toThrow()
+    expect(() => install(dir, 'node_modules/tailuo')).not.toThrow()
+    expect(() => uninstall(dir, 'node_modules/tailuo')).not.toThrow()
   })
 
   it('should migrate existing scripts (ghooks)', () => {
     mkdir(dir, '.git/hooks')
     writeFile(dir, 'package.json', '{}')
-    mkdir(dir, '/node_modules/yorkie')
+    mkdir(dir, '/node_modules/tailuo')
     writeFile(
       dir,
       '.git/hooks/pre-commit',
       '// Generated by ghooks. Do not edit this file.'
     )
 
-    install(dir, 'node_modules/yorkie')
+    install(dir, 'node_modules/tailuo')
     const hook = readFile(dir, '.git/hooks/pre-commit')
-    expect(hook).toMatch('yorkie')
+    expect(hook).toMatch('tailuo')
     expect(hook).not.toMatch('ghooks')
   })
 
   it('should migrate existing scripts (pre-commit)', () => {
     mkdir(dir, '.git/hooks')
     writeFile(dir, 'package.json', '{}')
-    mkdir(dir, '/node_modules/yorkie')
+    mkdir(dir, '/node_modules/tailuo')
     writeFile(dir, '.git/hooks/pre-commit', './node_modules/pre-commit/hook')
 
-    install(dir, 'node_modules/yorkie')
+    install(dir, 'node_modules/tailuo')
     const hook = readFile(dir, '.git/hooks/pre-commit')
-    expect(hook).toMatch('yorkie')
+    expect(hook).toMatch('tailuo')
     expect(hook).not.toMatch('./node_modules/pre-commit/hook')
   })
 
   it('should support installing from pnpm', () => {
     mkdir(dir, '.git/hooks')
-    mkdir(dir, 'node_modules/.pnpm/registry.npmmirror.com+yorkie@2.0.0/node_modules/yorkie')
+    mkdir(dir, 'node_modules/.pnpm/registry.npmmirror.com+tailuo@2.0.0/node_modules/tailuo')
     writeFile(dir, 'package.json', '{}')
 
-    install(dir, 'node_modules/.pnpm/registry.npmmirror.com+yorkie@2.0.0/node_modules/yorkie')
+    install(dir, 'node_modules/.pnpm/registry.npmmirror.com+tailuo@2.0.0/node_modules/tailuo')
     const hook = readFile(dir, '.git/hooks/pre-commit')
 
-    expect(hook).toMatch('#yorkie')
+    expect(hook).toMatch('#tailuo')
     expect(hook).toMatch('cd "."')
     expect(hook).toMatch('--no-verify')
 
     const prepareCommitMsg = readFile(dir, '.git/hooks/prepare-commit-msg')
     expect(prepareCommitMsg).toMatch('cannot be bypassed')
 
-    uninstall(dir, 'node_modules/.pnpm/registry.npmmirror.com+yorkie@2.0.0/node_modules/yorkie')
+    uninstall(dir, 'node_modules/.pnpm/registry.npmmirror.com+tailuo@2.0.0/node_modules/tailuo')
     expect(exists(dir, '.git/hooks/pre-push')).toBeFalsy()
   })
 })
